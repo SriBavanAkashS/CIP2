@@ -9,9 +9,6 @@ DATA_PATH = "../data/raw"
 OUTPUT_DIR = "../outputs/module1_data_loading"
 
 def save_module1_outputs(eeg_data, eeg_labels, subjects, output_dir=OUTPUT_DIR):
-    """
-    Save outputs from Module 1 (Data Loading) for presentation
-    """
     os.makedirs(output_dir, exist_ok=True)
     
     # Save data arrays
