@@ -15,6 +15,10 @@ except Exception as e:  # pragma: no cover
         "Install it (e.g., `pip install tensorflow`) and retry."
     ) from e
 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.utils.class_weight import compute_class_weight
+
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(_THIS_DIR, ".."))
@@ -91,7 +95,7 @@ def prepare_dataset():
 # --------------------------------------------------
 # MODEL (Module6.jpg + AlgoModule6)
 # --------------------------------------------------
-def build_module6_classifier(input_dim, num_classes=3, hidden_units1=128, hidden_units2=64, dropout_rate=0.5):
+def build_module6_classifier(input_dim, num_classes=3, hidden_units1=128, hidden_units2=64, dropout_rate=0.4):
     """
     Module 6 classifier:
       Temporal Feature Vector
@@ -122,7 +126,7 @@ def train_module6(
     X,
     y,
     batch_size=32,
-    epochs=30,
+    epochs=50,
     validation_split=0.2,
 ):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -130,13 +134,32 @@ def train_module6(
     num_classes = int(np.max(y)) + 1
     y_cat = to_categorical(y, num_classes=num_classes)
 
+    # Stratified split so train/val have representative class distribution
+    X_train, X_val, y_train, y_val = train_test_split(
+        X, y_cat, test_size=validation_split, stratify=y, random_state=42
+    )
+    y_train_labels = np.argmax(y_train, axis=1)
+
+    # Standardize features (fit on train only to avoid leakage)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_val = scaler.transform(X_val)
+
+    # Balanced class weights: penalize errors on minority classes more
+    classes = np.unique(y_train_labels)
+    weights = compute_class_weight(
+        "balanced", classes=classes, y=y_train_labels
+    )
+    class_weight = dict(zip(classes, weights))
+
     model = build_module6_classifier(input_dim=X.shape[1], num_classes=num_classes)
     history = model.fit(
-        X,
-        y_cat,
+        X_train,
+        y_train,
         batch_size=batch_size,
         epochs=epochs,
-        validation_split=validation_split,
+        validation_data=(X_val, y_val),
+        class_weight=class_weight,
         verbose=1,
     )
 
@@ -156,7 +179,7 @@ def train_module6(
         f.write(f"Final train acc: {history.history['accuracy'][-1]:.4f}\n")
         f.write(f"Final val   acc: {history.history['val_accuracy'][-1]:.4f}\n")
 
-    return model, history, model_path, summary_path
+    return model, history, model_path, summary_path, scaler
 
 
 def save_module6_visualizations(history, X, y, model, output_dir=OUTPUT_DIR):
@@ -253,14 +276,17 @@ if __name__ == "__main__":
     print(f"X shape: {X.shape}, y shape: {y.shape}, classes: {sorted(np.unique(y).tolist())}")
 
     print("\nTraining classifier (Dense1 + ReLU + Dropout1 -> Dense2 + ReLU + Dropout2 -> Softmax)...")
-    model, history, model_path, summary_path = train_module6(X, y, batch_size=32, epochs=30, validation_split=0.2)
+    model, history, model_path, summary_path, scaler = train_module6(
+        X, y, batch_size=32, epochs=50, validation_split=0.2
+    )
 
     print("\nSaved Module 6 model and summary:")
     print(f"  - {model_path}")
     print(f"  - {summary_path}")
 
     print("\nSaving Module 6 visualizations...")
-    viz_paths = save_module6_visualizations(history, X, y, model, output_dir=OUTPUT_DIR)
+    X_scaled = scaler.transform(X)
+    viz_paths = save_module6_visualizations(history, X_scaled, y, model, output_dir=OUTPUT_DIR)
     for p in viz_paths:
         print(f"  - {p}")
 
