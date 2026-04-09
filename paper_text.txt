@@ -1,0 +1,861 @@
+Received 23 May 2024, accepted 4 July 2024, date of publication 15 July 2024, date of current version 31 July 2024.
+Digital Object Identifier 10.1109/ACCESS.2024.3427822
+
+Human Brain Waves Study Using EEG and Deep
+Learning for Emotion Recognition
+MUSKAN PRIYADARSHANI1 , PUSHPENDRA KUMAR 2 , KANOJIA SINDHUBEN BABULAL
+DHARMENDRA SINGH RAJPUT 3 , AND HARSHITA PATEL 3
+
+2,
+
+1 Department of Computer Science and Engineering, Indian Institute of Technology Gandhinagar, Palaj 382355, India
+2 Department of Computer Science and Engineering, Central University of Jharkhand, Ranchi 835222, India
+3 School of Computer Science Engineering and Information Systems, VIT, Vellore 632014, India
+
+Corresponding author: Harshita Patel (harshita.patel@vit.ac.in)
+This work was supported by the Vellore Institute of Technology, Vellore.
+
+ABSTRACT Emotion Recognition is a critical area of research including healthcare, human-computer
+interaction, and psychology. While traditional methods mainly rely on facial expressions and textual analysis,
+they also have inherent flaws and cannot be reliable. Facial expression-based emotion recognition assumes
+that it represents genuine internal emotions that may be inaccurate. Similarly, textual analysis depends on the
+available data and needs help accurately capturing subtle emotions in text. However, electroencephalography
+(EEG) has emerged as a rising alternative for objective and real-time emotion recognition. Unlike facial
+and textual methods, EEG directly measures brain activity and provides a reliable result. To address this
+researchers have used basic machine learning methods that need manual feature extraction, which might
+miss essential data and make the process slow and less accurate. In this study, we propose a comprehensive
+methodology for EEG-based emotion recognition that addresses the limitations of traditional methods and
+basic machine learning techniques. Our approach involves preprocessing EEG signals using a butter-worth
+bandpass filter to eliminate noise, followed by feature extraction techniques. We then employ Principal
+Component Analysis (PCA) for dimensionality reduction, ensuring efficient data representation. To further
+enhance the model performance we explore machine learning classifiers(GaussianNB, SVM, Random
+Forest) and proposed an EEG-LSTM and GRU model with an accuracy of 97% and 96% respectively, that
+gives better results than the basic machine learning models.
+INDEX TERMS EEG, machine learning, deep learning, FFT, neural network, PSD, spectral entropy.
+I. INTRODUCTION
+
+A. NON-PHYSIOLOGICAL SIGNALS
+
+Affective computing has evolved as a significant subject
+of study to develop systems that can perceive emotions
+automatically. Emotion recognition technology is expected to
+be worth $21.6 billion in 2019 and $56 billion by 2024 [1].
+Our daily interactions with others, our decisions, and the way
+we describe the world are all influenced by our emotions.
+Although, basic human emotion can be recognized through
+body language and facial expressions, but there are additional
+specific types of emotions [2]. In recent decades, research on
+emotion recognition has been robust.It enables machines to
+learn about human emotions, and it can be achieved primarily
+in two ways:
+
+These signals represent how our body physically operates.
+It contains information that we gather from our surroundings,
+including visual and aural data. Examples include body
+language, voice tone, and facial emotion.
+
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Mouloud Denai
+101842
+
+.
+
+B. PHYSIOLOGICAL SIGNALS
+
+These signals are also related to the physical functioning
+of the body. It includes the changes in a human's mental
+state, heart rate, breathing, body temperature, and muscle
+tension. It can also provide us with some of the physical
+states, such as whether we are relaxed or stressed, and can
+also be used to measure the effects of different stimuli on our
+body.
+But in actual situations, it can be very challenging to
+tell someone’s feelings only by glancing at their face and
+
+2024 The Authors. This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License.
+For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+VOLUME 12, 2024
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+behavioral patterns [3]. Because, emotions are strong feelings
+acquired from human’s happenings, moods, or relationships
+with others. Emotions are basically mental states that come
+from changes in our body and brain. They can be related
+to our thoughts, behaviors, or how good or bad we feel.
+It is difficult to recognize the real or correct emotions of
+every human and also the expressions of disabled people
+based on their appearance. Also, there is an issue in modern
+times, especially with teenagers and adults that they often
+pretend to be happy and show off (fakeness) in social settings
+like- parties, clubs, and gatherings with friends. During the
+period of the COVID-19 epidemic, this pattern has become
+more noticeable. Social media has a big role in this trend,
+as people try to present themselves as a perfect and happy
+life to their friends and followers, even if it is not true.
+They may share pictures and stories that are not genuine,
+which leads to a culture of comparison and competition to
+show off. With these virtual social gatherings on the rise,
+people may feel more pressure to present a happy image,
+even if they are struggling. In this pandemic era, there
+has been a growing concern about mental health and wellbeing, particularly among individuals who are experiencing
+social isolation, financial stress, and uncertainty. According
+to recent studies [4], the COVID-19 pandemic has led to an
+increase in suicidal ideation and behavior, particularly among
+young adults.
+Emotion recognition based on EEG has the potential to
+be utilized as a tool to identify persons who are at risk of
+committing suicide. It can be achieved by identifying different patterns of brain activity that are related to depressing
+feelings, such as anxiety, hopelessness, and sorrow [5].
+An alternate approach to analyzing how individuals feel
+and gaining access to human emotion can be obtained by
+studying brain signals [6]. There are various methods for
+determining their dimensions, including invasive and noninvasive approaches. The non-invasive way provides a better
+way of measuring brain signals because they are more
+convenient and comfortable for the person being measured.
+EEG is an example of a non-invasive method that can be used
+to collect those signals. It is a better way to measure brain
+signals compared to other techniques or methods like- fMRI
+and MEG. Because it can show changes in the current brain's
+activity over a short period and is also cheaper to set up and
+use.
+EEG is a tool that can directly measure the neural activity
+of humans, and it is the most active way to assess the functions
+and waves of neurons. Neural activity is a type of brain
+function activity that occurs all at once in the brain and
+involves a large number of neurons in order to achieve the
+lowest levels of electric potential that enable EEG to record
+electrical signals [3]. The recorded signals are amplified and
+analyzed to reveal the actual patterns of brain activity known
+as brain waves [7]. These brain waves can change from one
+state to another depending on the activities that they are
+engaged in at a particular moment [8]. For instance, a person's
+brain waves in a scenario in which they are unconcerned,
+VOLUME 12, 2024
+
+easygoing, and frank are starkly different from someone who
+is working hard at something. On this basis, five types of
+brain waves that are commonly studied using EEG, where
+each with different frequencies and associated with different
+states of consciousness and cognitive processes are- ‘delta
+waves (0.5 to 4 Hz)’, ‘theta waves (4 to 7 Hz)’, ‘alpha waves
+(8 to 12 Hz)’, ‘beta waves (13 to 30 Hz)’, and ‘gamma
+waves of 30 Hz and higher’ are among the most researched
+waveforms [9].
+C. MOTIVATION
+
+Understanding and interpreting human emotions is crucial in
+various fields, including psychology, neuroscience, humancomputer interaction, and affective computing. Emotion
+recognition has the potential to revolutionize how we interact
+with technology, personalize user experiences, and improve
+mental health diagnosis and treatment. Traditional emotion
+recognition methods often rely on self-reporting, which can
+be subjective and prone to biases. Therefore, there is a
+growing need for objective and accurate methods to identify
+and classify emotions.
+By analyzing EEG signals, we can understand the neural
+mechanisms associated with different emotional states and
+develop robust models for emotion recognition.
+The primary motivation behind this research paper is to
+explore the intersection of EEG for emotion recognition• Improve the understanding of the neural basis of
+emotion, which could have important implications for
+the treatment of emotional disorders such as depression
+and anxiety.
+• Explore the effectiveness of deep learning models, such
+as Gated Recurrent Unit (GRU) and Long Short-Term
+Memory (LSTM), and analyze EEG signals for emotion
+recognition.
+• Learn to optimize the performance of DL models in
+classification.
+• Co-relation of emotions by analyzing the learned
+representations in deep learning models.
+D. RESEARCH CONTRIBUTION
+
+The research contribution is to find out the effectual
+and potential of integrating EEG signals and deep
+learning techniques for accurate and objective emotion
+recognition.
+• Design and implement deep learning models, such as
+gated recurrent unit (GRU) and long short-term memory
+(LSTM), for analyzing EEG signals. The models will be
+trained and evaluated on emotion recognition tasks using
+appropriate datasets.
+• Explore the ability of deep learning models to automatically learn meaningful representations from raw EEG
+signals.
+• Conduct comparative analyses with traditional machine
+learning approaches and assess the performance gain
+achieved by utilizing deep learning models.
+101843
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+II. RELATED WORKS
+
+Zhen et al. [10] in their study discussed the importance of
+face recognition and the existing literature on the neural
+mechanisms involved. It was necessary to do research on
+human participants utilizing fMRI, which recorded neural
+activity as the subjects performed facial recognition tasks.
+The authors analyzed the data using network analysis
+techniques to identify the hierarchical organization of brain
+regions involved in face recognition. The results showed
+that face recognition involved a hierarchical network of
+brain regions, with lower-level regions responsible for basic
+visual processing and higher-level regions responsible for
+more complex cognitive processes such as facial identity
+recognition. They discussed the importance of a hierarchical
+organization in the brain network for efficient face recognition. The findings offered implications for understanding
+the neural mechanisms of face recognition and developing
+more effective techniques for artificial face recognition.
+It did not investigate the effects of other elements, such as
+mood or context, on the neural network responsible for face
+recognition in the brain.
+Pandey and Seeja [11] in their study aimed to recognize
+emotional states using electroencephalogram (EEG) signals
+through a subject-independent approach. They discussed
+the importance of emotion recognition in various fields
+and the challenges associated with traditional methods of
+emotion recognition. It involved collecting EEG signals from
+human subjects while they were exposed to emotionally
+evocative stimuli. They were able to classify the different
+emotional states by using machine learning models after
+training them with strategies for extracting characteristics
+from the EEG signals. The approach that was suggested was
+successful to the extent of 86.4%, in identifying six different
+emotional states, namely happy, sorrow, anger, fear, disgust,
+and surprise. This study used a limited number of emotional
+states, and further research may be necessary to extend the
+method to more complex emotional states.
+Doma and Pirouz [12] explored how EEG and peripheral
+physiological inputs from human participants are employed
+in emotion recognition with ML algorithms when they were
+exposed to emotionally expressive stimuli. They extracted
+key elements from the signals using feature extraction and
+trained machine learning models to classify the emotional
+states. They employed the random forest technique, which
+outperforms other machine learning approaches in emotion
+recognition when using both EEG and periphery physiological inputs.
+Tan et al. [13] in their study proposed a multimodal
+emotion detection system that improved the accuracy of emotion recognition carried out by integrating facial expression
+analysis and EEG. This study involved 20 participants who
+were shown emotional images while recording their facial
+expressions and EEG signals. They analyzed the EEG signals
+using a wavelet transform, then they utilized a CNN to extract
+information from the facial expressions. They were input into
+
+101844
+
+an SVM classifier in order to make a prediction regarding the
+participant's feelings. The results showed that this approach
+achieved a higher accuracy (86.5%) in recognizing emotions
+than the unimodal approach that only used facial expressions
+(76.7%) or EEG (71.3%) alone. After combining facial
+expression analysis with EEG signals, this method improved
+the accuracy of emotion recognition. They also suggested that
+this method could be used in the future for the diagnosis and
+treatment of emotional disorders.
+Hassouneh et al. [8] discussed previous studies on emotion
+recognition, including various methods such as physiological
+signals, facial expressions, and speech analysis. They also
+highlighted the importance of real-time emotion recognition
+systems in various fields, such as healthcare and HCI.
+They explained the feature extraction and selection process
+before training the ML and deep neural network approaches.
+The performance evaluation of the developed system using
+various metrics such as accuracy, sensitivity, and specificity.
+They also reported the high accuracy and effectiveness of the
+developed system in recognizing different emotional states.
+Gao et al. [14] in their study introduced Deep Learning
+(DL) algorithms as a promising approach to overcome
+these challenges. Then, they explained the feature extraction
+process before training the DL models. The performance
+evaluation of the developed system using various metrics
+such as accuracy and confusion matrix. They highlighted the
+potential of DL algorithms in improving emotion recognition
+from EEG signals. They also suggested future research
+directions for improving the system's performance, including
+the use of more advanced deep learning architectures and the
+integration of multiple modalities of data.
+In their study, Schyns et al. [15] explored the neural
+mechanisms that allowed humans to categorize facial expressions.When participants saw images of faces expressing
+various emotions, their brain activity was monitored using
+fMRI. They found that the brain processed facial expressions
+in a hierarchical manner, with lower-level visual features
+(such as eye and mouth movements) being processed
+first, followed by higher-level features (such as the overall
+expression). The brain uses a dynamic integration process
+to categorize facial expressions, with different stages of
+processing occurring at different times. They also suggested that this dynamic process may be important for the
+perception of complex stimuli in general, not just facial
+expressions.
+Similarly, Ismail et al. [6] looked over the feasibility of
+using EEG to detect human emotions. They conducted an
+experiment in which participants were asked to watch short
+video clips designed to evoke different emotions while their
+brain activity was recorded using EEG. They discovered that
+many emotional states, including happiness, sorrow, anger,
+and fear, were related to patterns of brain activity in the
+parietal and frontal brain regions. EEG has the potential to be
+an effective tool for detecting human emotions. The fact that
+there were only 12 participants in the sample size and that it is
+
+VOLUME 12, 2024
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+for classification. Popular techniques like Fast Fourier Transform (FFT) can be used in Power Spectral Density (PSD) and
+Spectral Entropy (SE) to extract frequency or time-domain
+features from the EEG data. After feature extraction, the
+features are encoded into a normalized data format. Next,
+we used PCA which helps in minimizing the complexity
+of the dataset by transforming the original features into a
+smaller set of uncorrelated principal components. It utilizes
+machine learning [16] and a deep learning algorithm to train a
+classification model using the extracted features. The chosen
+model (e.g., GaussianNB, SVM, Random Forest) [17] and the
+deep learning models- LSTM and GRU. It is instantiated and
+trained using the training data. The trained model’s ability
+to predict emotions is next tested using the testing data.
+To assess the model’s efficiency, evaluation metrics such as
+‘‘accuracy, precision, recall, and F1-score’’ can be generated.
+EEG-LSTM Algorithm
+FIGURE 1. Framework for Emotion Recognition using EEG dataset.
+
+unclear whether the findings apply to other emotional states
+are two limitations of this study.
+III. PROPOSED METHODOLOGY
+
+There are a few phases involved in classifying the various
+emotions based on the ‘‘Human Brain Waves Study using
+EEG and Deep Learning for Emotion Recognition’’ that are
+represented in the figure 1. The implementation involves a
+couple of machine learning and deep learning approaches to
+recognize people's real and exact emotions. The first stage is
+to gather the EEG data, which has been done through Kaggle1
+that contains electroencephalogram (EEG) measurements
+from multiple participants as they went through different
+states of emotions. The dataset used in this model, named
+the ‘‘Emotion EEG’’ dataset, comprises EEG recordings of
+the brain activity as individuals watched emotional videos.
+These recordings are labeled with basic emotional states:
+happiness, sadness, anger, fear, surprise, and neutral. Each
+column in the dataset contains numerical values representing
+brainwave amplitudes at specific time intervals. Also, the
+dataset contains 15 EEG channels, each capturing brainwaves
+from distinct locations on the scalp where electrodes were
+positioned.
+This framework aims to predict the emotional states of
+individuals based on their brain activity captured through
+EEG measurements using the steps shown in the figure 1.
+The data is preprocessed to prepare it for model training.
+The handling of missing values, normalization of the feature
+values, and division of the data into training and testing sets
+are all included in this. The EEG signals are raw time-series
+data, which need to be transformed into meaningful features
+1 Retrieved
+
+from
+https://www.kaggle.com/datasets/birdy654/eegbrainwave-dataset-feeling-emotions?select=emotions.csv accessed on
+03/11/2022.
+VOLUME 12, 2024
+
+Step 1: Loading EEG data and their corresponding
+emotion labels.
+Step 2: Pre-processing
+i. A Butterworth bandpass filter is applied with
+a passband of 0.5Hz to 30Hz using1
+H (s) = q
+s 2n
+1 + (( wc
+) )
+
+(1)
+
+where, H (s) = transfer function of the filter
+s=laplace variable, wc = cut-off frequency
+[0.5-30Hz], n=filter order (5)
+ii. Here, the signal is divided into overlapping segments using Power Spectral Density
+(PSD), with each segment's periodogram
+being calculated after applying a window
+function to it.
+
+
+1
+|FFT(x (t) ∗w(t)|2
+Pxx (f) =
+M ∗ fs
+(2)
+where, Pxx (f)= PSD estimate at frequency f,
+M = number of segments (8), fs = sampling
+rate, x (t) = signal, w(t) = window function:
+Hamming window FFT denotes the discrete
+Fourier transform
+Step 3: Feature Extraction
+i. Measurement of power of signal over a range
+of frequency using FFTPSD = abs
+
+(fft (x (n)) )2
+N
+
+(3)
+
+N= length of the signal
+ii. Spectral Entropy (SE) is calculated to measure the spectral complexity of a signal by
+101845
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+using PSD.
+SE= −
+
+N
+X
+
+P (m) log2 P (m)
+
+(4)
+
+m=1
+
+where, P = normalized PSD, P(m) = probability distribution of signal
+iii. To check the activity and complexity of the
+signal, we are using Hjorth parameterActivity = var (x (n))
+RR
+std(
+x(n)
+Complexity =
+std(x (n) )
+
+(5)
+(6)
+
+var= variance, std= standard deviation of
+signal
+Step 4: Model Creation using LSTM
+i. Initialize hidden states ht−1 and cell state Ct .
+ii. Compute the input, forget, and output gates,
+respectively
+
+input gate : it = σ (wi ht−1, xt +bi (7)
+It regulates how information from new
+sources enters the cell.
+
+
+forget gate : ft = σ (wf ht−1, xt +bf (8)
+It regulates the information transfer from the
+prior hidden state ht−1 into the present hidden
+state ht
+
+
+output gate : ot = σ (wo ∗ ht−1, xt +bo
+(9)
+It manages the information transfer from the
+cell state Ct where, ‘‘ wi ,bi ,wf , and bf are
+learnable parameters’’, and ‘‘σ is the sigmoid
+activation function’’
+iii. Now, updating the cell state (Ct ) by adding
+new input information and removing the old
+information controlled by the forget gate ft
+
+
+Ct =ft ∗Ct−1 +it ∗tanh(wc ∗ ht−1, xt +bc
+(10)
+where, wc and bc are learnable parameters,
+and The hyperbolic tangent activation function is tanh The final output vector is:
+yt =ot ∗tanh(Ct )
+
+(11)
+
+The cell state is using a hyperbolic tangent
+function and the output gate uses a sigmoid
+function.
+The EEG data is loaded here with their corresponding
+emotion labels such as: neutral, positive, and negative.
+A Butterworth bandpass filter with a passband of 0.5Hz to
+30Hz is used to pre-process the data, and then divide the
+101846
+
+FIGURE 2. LSTM model architecture.
+
+signal into overlapping segments, applied a window function
+of length 256 samples to each segment, and compute the
+periodogram of each segment to obtain the Power Spectral
+Density (PSD) estimates.
+After preprocessing the feature extraction takes place,
+including the PSD, Spectral Entropy (SE), and Hjorth
+parameters (Activity and Complexity). The absolute square
+of the FFT of the signal, normalized by the length of the
+signal, is used to calculate the PSD [18]. The Shannon entropy
+formula is used to take the normalized PSD and calculate SE,
+a measure of the signal's spectral complexity [19].
+The signal’s variance and standard deviation, which
+represent the activity and complexity of the signal, respectively, are the Hjorth parameters [20]. After that,we created
+an EEG-LSTM and GRU model. The choice of Long
+Short-Term Memory (LSTM) and Gated Recurrent Unit
+(GRU) models for this study is driven by their exceptional
+ability to handle sequential data and capture temporal dependencies, which are crucial for effective emotion recognition
+from EEG signals. As illustrated in our workflow, EEG
+signals are inherently sequential and represent dynamic
+brain activity over time. LSTM and GRU networks are
+specifically designed to process such time-series data,
+making them well-suited for capturing the intricate temporal
+patterns associated with different emotional states. LSTM
+is efficient at handling ‘sequential’ input. LSTM networks
+are frequently used for tasks including speech recognition,
+language modeling, and time series prediction because they
+have the capacity to learn long-term dependencies in the input
+sequences. The LSTM network generates an output vector yt
+and an updated hidden state vector ht at each time step t by
+taking an input vector xt and a hidden state vector ht−1 as
+inputs. The hidden state vector ht contains information about
+the context of the input sequence up to time t. It has three
+gates - input, forget, and output gates.
+Information that goes into and out of the LSTM cell in
+the figure 2 is managed through the help of these gates.
+The ‘input gate’ controls ‘the flow of new information into
+the cell’, ‘forget gate’ controls ‘the transition from one
+VOLUME 12, 2024
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+hidden state to another’, and the ‘output gate’ controls ‘the
+flow of information out of the cell’. With the addition of
+new input data and the removal of outdated data under the
+direction of the forget gate, the LSTM ‘cell state’ is updated.
+By ‘multiplying the cell state’ by the 3 inputs, the LSTM's
+output is calculated (positive, negative, and neutral emotions)
+output gate, which is passed through a hyperbolic tangent
+function to obtain the final output vector [21].
+Another type of recurrent neural network (RNN) designed
+for dealing with sequential information such as time series
+or data with natural language, is the GRU (Gated Recurrent
+Unit) in figure3.
+
+FIGURE 3. GRU model architecture.
+
+It has been designed to solve the classic RNN's vanishing
+gradient issue and identify long-term dependencies in the
+input sequence. The ‘update gate’ and the ‘reset gate’ are its
+two main gates. How much of the prior memory should be
+kept and transferred to the current time step is decided by the
+update gate. It is calculated by linearly combining the ‘current
+time step's’ input and the hidden state from the ‘previous time
+step’ with a sigmoid activation function [22].
+zt = σ (Wz ∗xt +Uz ∗h{t−1} )
+
+FIGURE 4. Confusion matrix of the proposed LSTM model.
+
+produced more efficient and accurate results as in figure 4.
+This concept categorizes the various emotions based on EEG
+brain waves. The testing set's EEG signals' emotions are
+predicted using the trained model LSTM and GRU.
+The true labels for the ‘‘Neutral’’ class are shown in the
+first row. It shows that 150 cases were correctly classified
+as ‘‘Neutral’’ (true negatives), three cases were wrongly
+classified as ‘‘Positive’’ (false positives), and 0 cases were
+incorrectly classed as ‘‘Negative’’ (false negatives). The
+actual labels for the ‘‘Positive’’ class are shown in the second
+row. 136 instances were properly predicted as ‘‘Positive’’
+(true positives), 2 instances were incorrectly labeled as
+‘‘Neutral’’ (false negatives), and 4 instances were incorrectly
+labeled as ‘‘Negative’’ (false positives). The actual labels
+for the ‘‘Negative’’ class are shown in the third row.
+It demonstrates that there were 130 cases where the outcome
+was accurately predicted as ‘‘Negative’’ (true negatives),
+1 instance where the outcome was incorrectly calculated
+as ‘‘Positive,’’ and 1 incident where both ‘‘Neutral’’ and
+‘‘Positive’’ were incorrectly expected.
+
+(12)
+
+The reset gate chooses how much of the prior memory
+should be removed, and which elements of the prior memory
+should be taken into consideration in the present time step is
+controlled by this.
+rt = σ (Wr ∗xt +Ur ∗h{t−1} )
+
+(13)
+
+Backpropagation through time (BPTT) is used to train
+these by minimizing a loss function between the expected
+output sequence and the actual output sequence [23]. After
+training on the training set, the model is tested on the testing
+set, and measures such as ‘‘accuracy, precision, recall, and F1
+score’’ are used to assess the model's effectiveness. Crossvalidation is used to fine-tune the model's hyperparameters,
+such as the number of LSTM and GRU units, dropout rate,
+and epoch count.
+IV. RESULTS AND DISCUSSION
+
+The use of deep learning methodology and ‘advanced
+neural networks’ for EEG emotion detection and prediction
+VOLUME 12, 2024
+
+FIGURE 5. Proposed LSTM model training and validation accuracy.
+
+In figure 5 the accuracy values are represented by the ‘yaxis’ on the first subplot, and the ‘x-axis’ is the epoch count.
+The blue line shows the validation accuracy, and the red line
+shows the training evaluation. It allows us to visualize how the
+accuracy of the model changes during training and validation.
+The second subplot's y-axis displays the loss values, which
+101847
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+are commonly calculated using cross-entropy, and the x-axis
+displays the count of epochs. The blue line is ‘validation loss’,
+and the red line shows ‘training loss’. It allows us to visualize
+the loss of the model.
+
+labeled as ‘‘positive (true positives)’’. The total count
+of occurrences for each class that were classified ‘‘(true
+positives and true negatives)’’ and the count of instances for
+which the classification was incorrect (false positives and
+false negatives).
+
+FIGURE 6. ROC curve plot for proposed LSTM model.
+FIGURE 8. GRU model training and validation accuracy.
+
+For each class, it illustrates the ratio between actual
+‘‘positive and false positive’’ rates. The plot in figure 6
+displays the ROC curve for each class, along with the
+corresponding AUC score for negative (AUC:0.99), neutral
+(AUC:0.97), and positive (AUC:0.98). The AUC score
+represents the performance of the classifier, with higher
+values indicating a more powerful capacity to discriminate.
+The legend shows the class labels and their respective AUC
+scores. The ‘y-axis’ represents the ‘true positive rate’, while
+the ‘x-axis’ represents the ‘false positive rate’.
+GRU and LSTM are related since both employ different
+strategies for information gating to get over the vanishing
+gradient problem.
+
+The ‘‘training and validation accuracy’’ is shown in the
+first subplot of figure 8 over the epochs, while the training
+and validation loss is shown in the second subplot. These
+plots provide insights into the model's performance during
+training, such as the convergence of accuracy and the
+behavior of the loss function.
+
+FIGURE 9. ROC curve plot for GRU model.
+
+FIGURE 7. Confustion matrix of the proposed GRU model.
+
+Figure 7 represents the evaluation of a ‘GRU classification model’. The true class is represented by the
+matrix's rows, while the predicted class is represented
+by its columns. The first row shows the 150 cases that
+were accurately labeled as ‘‘negative (true negatives)’’,
+130 instances that were accurately labeled as ‘‘neutral
+(true neutral)’’, and 130 instances that were accurately
+101848
+
+Each class is represented by a separate curve in figure 9,
+and the ‘area under curve (AUC)’ represents the classification
+performance for that class. The legend shows the class
+names and their corresponding AUC scores for negative,
+neutral and positive. The graph helps in determining the
+model's proficiency for classifying entities and evaluating
+performance amongst them. A higher AUC score indicates
+better classification accuracy.
+Figure 10 represents the classification performance of
+the models. Each value in the matrix indicates the number
+of samples falling into specific categories. The diagonal
+VOLUME 12, 2024
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+FIGURE 10. Confusion matrix of the used machine learning classifiers.
+
+elements indicate correct predictions for each class, while
+off-diagonal elements represent misclassifications. Visualizing the matrices helps assess the models' performance,
+with different colors indicating the varying counts or
+percentages. By analyzing the confusion matrices, strengths
+and weaknesses of classifiers can be identified, aiding in
+selecting the most suitable model and understanding its
+ability to correctly classify instances.
+The model's performance has been evaluated using several
+criteria, including- ‘‘accuracy, precision, recall, and F1
+score’’. In Table 1, we present the performance metrics for
+various models.
+TABLE 1. Performance model using several metrics.
+
+The findings suggest that the LSTM model performed
+well in terms of accuracy and other metrics, showing that
+it was successful in classifying various emotions from the
+EEG signals. Now it shows how to classify EEG signals
+into various emotions using LSTM algorithms. This work
+has potential applications in affective computing, humancomputer interaction, and neuroscience.
+V. CONCLUSION AND FUTURE WORK
+
+The model presented in this work has shown good results in
+classifying EEG brain signals into different emotions. By this
+work, the ability to classify emotions with EEG signals could
+enable more personalized and adaptive human-computer
+interaction and improve our understanding of the neural
+mechanisms underlying emotional processing. However,
+there are some limitations. The dataset was small and only
+included EEG data from people watching emotional videos.
+Additionally, the features extracted in this study are relatively
+VOLUME 12, 2024
+
+simple and may only partially capture the complex patterns in
+EEG signals relevant to emotion classification.
+Future research could overcome these constraints by
+utilizing larger and more expanded datasets and exploring
+better feature extraction techniques and machine learning
+algorithms. This work represents the right step in the direction
+of EEG-based emotion classification systems and opens
+up new avenues for research in affective computing and
+neuroscience.
+Declarations: The authors declare that they have no
+conflict of interest.
+Data Availability Statement: The dataset analyzed during
+the current study is openly available at [https://www.kaggle.
+com/datasets/birdy654/eeg-brainwave-dataset-feelingemotions?select=emotions.csv] accessed on 03/11/2022
+REFERENCES
+[1] R. Shashidhar, S. S. Tippannavar, K. B. Bhat, N. Sharma, M. Rashid, and
+A. Rana, ‘‘EEG-based brain wave recognition using GRU and LSTM,’’
+in Proc. 5th Int. Conf. Contemp. Comput. Informat. (ICI), Dec. 2022,
+pp. 1083–1087.
+[2] S. M. Alarcão and M. J. Fonseca, ‘‘Emotions recognition using EEG
+signals: A survey,’’ IEEE Trans. Affect. Comput., vol. 10, no. 3,
+pp. 374–393, Jul. 2019.
+[3] N. S. Suhaimi, J. Mountstephens, and J. Teo, ‘‘EEG-based emotion
+recognition: A state-of-the-art review of current trends and opportunities,’’
+Comput. Intell. Neurosci., vol. 2020, pp. 1–19, Sep. 2020.
+[4] M. Reinke, C. Falke, K. Cohen, D. Anderson, K. R. Cullen, and
+J. L. Nielson, ‘‘Increased suicidal ideation and suicide attempts in
+COVID-19 patients in the United States: Statistics from a large national
+insurance billing database,’’ Psychiatry Res., vol. 323, May 2023,
+Art. no. 115164.
+[5] M. Egger, M. Ley, and S. Hanke, ‘‘Emotion recognition from physiological
+signal analysis: A review,’’ Electron. Notes Theor. Comput. Sci., vol. 343,
+pp. 35–55, May 2019.
+[6] W. O. A. S. Wan Ismail, M. Hanif, S. B. Mohamed, N. Hamzah, and
+Z. I. Rizman, ‘‘Human emotion detection via brain waves study by using
+electroencephalogram (EEG),’’ Int. J. Adv. Sci., Eng. Inf. Technol., vol. 6,
+no. 6, p. 1005, Dec. 2016.
+[7] H. Rajaguru and S. K. Prabhakar, ‘‘Non linear ICA and logistic regression
+for classification of epilepsy from EEG signals,’’ in Proc. Int. Conf.
+Electron., Commun. Aerosp. Technol. (ICECA), vol. 1, Apr. 2017,
+pp. 577–580.
+[8] A. Hassouneh, A. M. Mutawa, and M. Murugappan, ‘‘Development of a
+real-time emotion recognition system using facial expressions and EEG
+based on machine learning and deep neural network methods,’’ Informat.
+Med. Unlocked, vol. 20, Jan. 2020, Art. no. 100372.
+[9] M. N. Fakhruzzaman, E. Riksakomara, and H. Suryotrisongko, ‘‘EEG
+wave identification in human brain with emotiv EPOC for motor imagery,’’
+Proc. Comput. Sci., vol. 72, pp. 269–276, Jan. 2015.
+[10] Z. Zhen, H. Fang, and J. Liu, ‘‘The hierarchical brain network for face
+recognition,’’ PLoS ONE, vol. 8, no. 3, Mar. 2013, Art. no. e59886.
+[11] P. Pandey and K. Seeja, ‘‘Emotional state recognition with EEG signals
+using subject independent approach,’’ in Data Science and Big Data
+Analytics. Berlin, Germany: Springer, 2019, pp. 117–124.
+[12] V. Doma and M. Pirouz, ‘‘A comparative analysis of machine learning
+methods for emotion recognition using EEG and peripheral physiological
+signals,’’ J. Big Data, vol. 7, no. 1, pp. 1–21, Dec. 2020.
+[13] Y. Tan, Z. Sun, F. Duan, J. Solé-Casals, and C. F. Caiafa, ‘‘A
+multimodal emotion recognition method based on facial expressions
+and electroencephalography,’’ Biomed. Signal Process. Control, vol. 70,
+Sep. 2021, Art. no. 103029.
+[14] Y. Gao, H. J. Lee, and R. M. Mehmood, ‘‘Deep learninig of EEG signals
+for emotion recognition,’’ in Proc. IEEE Int. Conf. Multimedia Expo
+Workshops (ICMEW), Jun. 2015, pp. 1–5.
+[15] P. G. Schyns, L. S. Petro, and M. L. Smith, ‘‘Dynamics of visual
+information integration in the brain for categorizing facial expressions,’’
+Current Biol., vol. 17, no. 18, pp. 1580–1585, Sep. 2007.
+101849
+
+M. Priyadarshani et al.: Human Brain Waves Study Using EEG and Deep Learning for Emotion Recognition
+
+[16] P. Fabian, ‘‘Scikit-learn: Machine learning in Python,’’ J. Mach. Learn.
+Res., vol. 12, p. 2825, Nov. 2011.
+[17] D. Bertsimas, J. Dunn, and A. Paschalidis, ‘‘Regression and classification
+using optimal decision trees,’’ in Proc. IEEE MIT Undergraduate Res.
+Technol. Conf. (URTC), Nov. 2017, pp. 1–4.
+[18] G. M. Rojas, C. Alvarez, C. E. Montoya, M. de la Iglesia-Vayá,
+J. E. Cisternas, and M. Gálvez, ‘‘Study of resting-state functional connectivity networks using EEG electrodes position as seed,’’ Frontiers
+Neurosci., vol. 12, p. 235, Apr. 2018.
+[19] S. Maren, K. L. Phan, and I. Liberzon, ‘‘The contextual brain: Implications
+for fear conditioning, extinction and psychopathology,’’ Nature Rev.
+Neurosci., vol. 14, no. 6, pp. 417–428, Jun. 2013.
+[20] J. U. Blackford and D. S. Pine, ‘‘Neural substrates of childhood
+anxiety disorders: A review of neuroimaging findings,’’ Child Adolescent
+Psychiatric Clinics North America, vol. 21, no. 3, pp. 501–525, 2012.
+[21] R. K. Jeevan, S. P. V. M. Rao, P. S. Kumar, and M. Srivikas, ‘‘EEG-based
+emotion recognition using LSTM-RNN machine learning algorithm,’’ in
+Proc. 1st Int. Conf. Innov. Inf. Commun. Technol. (ICIICT), Apr. 2019,
+pp. 1–4.
+[22] P. V. P. Sai Kiran, S. Reddy Vangala, and M. Rashid, ‘‘Efficient approach
+for measuring heart pulse from real time facial RGB color videos,’’ in Proc.
+2nd Int. Conf. Intell. Eng. Manage. (ICIEM), Apr. 2021, pp. 412–416.
+[23] J. Liu, Y. Tu, and L. Hu, ‘‘Neuroimaging-based clinical tools for brain
+disorders,’’ Brain Sci. Adv., vol. 7, no. 2, pp. 73–74, Jun. 2021.
+
+MUSKAN PRIYADARSHANI received the
+B.Tech. degree from Jharkhand Rai University,
+in 2021, and the M.Tech. degree from the
+Central University of Jharkhand, in 2023. She is
+currently pursuing the Ph.D. degree in computer
+science and engineering with Indian Institute of
+Technology Gandhinagar, Gujarat. Her current
+research interests include machine learning,
+artificial intelligence, and deep learning using
+EEG and eye-tracking for emotion classification.
+
+PUSHPENDRA KUMAR received the Ph.D.
+degree from the National Institute of Technology,
+Bhopal, Madhya Pradesh. He is currently an
+Assistant Professor with the Department of Computer Science and Engineering, Central University
+of Jharkhand, Ranchi, India. He has published
+research work in various reputed journals. His
+research interests include data mining, machine
+learning, and deep learning.
+
+101850
+
+KANOJIA SINDHUBEN BABULAL received the
+Ph.D. degree in computer science from the University of Allahabad, in 2012. She is currently an
+Assistant Professor with the Department of Computer Science and Engineering, Central University
+of Jharkhand, Ranchi, India. She has published
+research work in various reputed journals. Her
+research interests include energy efficient wireless
+sensor networks, MANETS, cross layer designs,
+opportunistic and cooperative routing, 5G, and
+computer vision.
+
+DHARMENDRA SINGH RAJPUT received the
+Ph.D. degree from NIT, Bhopal, India, in 2014.
+He has been a Professor with the Department
+of Software and Systems Engineering, SCORE,
+VIT, Vellore, since June 2014. He has published
+more than 35 reputed journal articles, five edited
+books published under reputed publishers, and
+17 papers presented in the reputed international
+conferences. His research interests include data
+mining, machine learning, and big data. He is
+also a guest editor of various reputed journals. He has received various
+awards from Indian Government, such as DST-SERB, CSIR Travel Grant,
+and MPCST Young Scientist Fellowship. He is doing the funded project
+of 80 lakhs, which is received from Erasmus + Program of European
+Union with the partner the University of Nottingham, U.K. He has visited
+various countries U.K., France, Singapore, United Arab Emirates, China, and
+Malaysia, for academic purposes.
+
+HARSHITA PATEL received the Ph.D. degree
+from the Maulana Azad National Institute of
+Technology, Bhopal, Madhya Pradesh, India,
+in 2017. She is currently an Associate Professor
+with the School of Computer Science Engineering and Information Systems (SCORE), VIT,
+Vellore, India. Additionally, she has qualified
+national-level competitive exams like GATE and
+UGC-NET. She has more than 14 years of teaching
+and research experience. She has published a
+good number of research papers in various conferences and journals of
+international repute which are indexed in SCOPUS and SCI. She has also
+delivered expert lectures in reputed workshops. Her research interests include
+data mining, machine learning, and artificial intelligence.
+
+VOLUME 12, 2024
+
+

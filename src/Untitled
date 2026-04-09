@@ -1,0 +1,32 @@
+def save_channel_importance_map(mean_importance, channel_names=None, output_dir=OUTPUT_DIR):
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    # -------- Normalize to percentage --------
+    total = np.sum(mean_importance)
+    importance_percent = (mean_importance / total) * 100
+
+    # -------- Sort top 10 --------
+    top_k = 10
+    indices = np.argsort(importance_percent)[::-1][:top_k]
+
+    top_values = importance_percent[indices]
+
+    if channel_names is not None:
+        labels = [channel_names[i] for i in indices]
+    else:
+        labels = [f"Ch {i}" for i in indices]
+
+    # -------- Plot --------
+    plt.figure(figsize=(10, 5))
+    plt.bar(labels, top_values, color="royalblue")
+    plt.ylabel("Contribution (%)")
+    plt.title("Top EEG Channels Contributing to Prediction")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    path = os.path.join(output_dir, "channel_importance_top10.png")
+    plt.savefig(path, dpi=300)
+    plt.close()
+
+    return path
